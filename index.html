@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nouchi Gospel</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      height: 100vh;
+      overflow: hidden;
+      color: white;
+      background:
+        radial-gradient(circle at top, rgba(255, 205, 96, 0.12), transparent 30%),
+        radial-gradient(circle at bottom, rgba(111, 82, 255, 0.12), transparent 28%),
+        linear-gradient(180deg, #0d1220 0%, #070a12 55%, #030407 100%);
+    }
+
+    canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .halo {
+      position: absolute;
+      width: 420px;
+      height: 420px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 210, 110, 0.22), transparent 70%);
+      filter: blur(18px);
+      animation: pulse 3.2s ease-in-out infinite;
+      z-index: 1;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(0.95);
+        opacity: 0.8;
+      }
+      50% {
+        transform: scale(1.08);
+        opacity: 1;
+      }
+    }
+
+    .card {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 430px;
+      border-radius: 30px;
+      padding: 30px 24px 24px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(14px);
+      box-shadow:
+        0 0 45px rgba(255, 210, 110, 0.10),
+        0 20px 60px rgba(0, 0, 0, 0.35);
+      text-align: center;
+      animation: floatCard 4.5s ease-in-out infinite;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        135deg,
+        rgba(255,255,255,0.10),
+        rgba(255,255,255,0.02),
+        rgba(255, 209, 102, 0.04)
+      );
+      pointer-events: none;
+    }
+
+    @keyframes floatCard {
+      0%, 100% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(-7px);
+      }
+    }
+
+    .logo {
+      width: 96px;
+      height: 96px;
+      margin: 0 auto 18px;
+      border-radius: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 42px;
+      background: linear-gradient(135deg, #ffdf8d, #e2a835);
+      color: #251400;
+      box-shadow:
+        0 0 18px rgba(255, 215, 120, 0.35),
+        0 0 34px rgba(255, 215, 120, 0.25);
+      animation: glowLogo 2.2s ease-in-out infinite alternate;
+    }
+
+    @keyframes glowLogo {
+      from {
+        transform: scale(1);
+        box-shadow:
+          0 0 18px rgba(255, 215, 120, 0.28),
+          0 0 28px rgba(255, 215, 120, 0.18);
+      }
+      to {
+        transform: scale(1.05);
+        box-shadow:
+          0 0 28px rgba(255, 215, 120, 0.48),
+          0 0 44px rgba(255, 215, 120, 0.25);
+      }
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+      letter-spacing: 0.2px;
+    }
+
+    .subtitle {
+      color: rgba(255,255,255,0.78);
+      font-size: 0.98rem;
+      margin-bottom: 22px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 8px 14px;
+      border-radius: 999px;
+      margin-bottom: 18px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: #ffe7a4;
+      background: rgba(255, 219, 122, 0.10);
+      border: 1px solid rgba(255, 219, 122, 0.18);
+    }
+
+    .verse-box {
+      min-height: 165px;
+      border-radius: 22px;
+      padding: 22px 18px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      margin-bottom: 18px;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      box-shadow: inset 0 0 20px rgba(255,255,255,0.02);
+    }
+
+    .verse-box.flash {
+      transform: scale(1.02);
+      box-shadow:
+        0 0 22px rgba(255, 215, 120, 0.15),
+        inset 0 0 22px rgba(255,255,255,0.03);
+    }
+
+    .verse-text {
+      font-size: 1.08rem;
+      line-height: 1.65;
+      color: #fff7df;
+      transition: all 0.45s ease;
+    }
+
+    .verse-ref {
+      margin-top: 14px;
+      color: #f3c867;
+      font-size: 0.92rem;
+      font-weight: bold;
+      opacity: 0.95;
+      transition: all 0.45s ease;
+    }
+
+    .fade-out {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    .buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 6px;
+    }
+
+    button {
+      border: none;
+      outline: none;
+      border-radius: 999px;
+      padding: 14px 20px;
+      cursor: pointer;
+      font-size: 0.98rem;
+      font-weight: 800;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px) scale(1.02);
+    }
+
+    .primary-btn {
+      background: linear-gradient(135deg, #ffdf8d, #d49622);
+      color: #241300;
+      box-shadow: 0 10px 24px rgba(212, 150, 34, 0.25);
+    }
+
+    .secondary-btn {
+      background: rgba(255,255,255,0.08);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .footer {
+      margin-top: 18px;
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.54);
+      line-height: 1.5;
+    }
+
+    @media (max-width: 520px) {
+      .card {
+        padding: 26px 18px 22px;
+      }
+
+      h1 {
+        font-size: 1.7rem;
+      }
+
+      .verse-text {
+        font-size: 1rem;
+      }
+
+      .logo {
+        width: 88px;
+        height: 88px;
+        font-size: 38px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="bg"></canvas>
+
+  <div class="container">
+    <div class="halo"></div>
+
+    <div class="card">
+      <div class="logo">✝</div>
+      <h1>Nouchi Gospel</h1>
+      <p class="subtitle">Dieu parle aussi ton langage</p>
+      <div class="badge">App spirituelle • vibe moderne • nouchi + gospel</div>
+
+      <div class="verse-box" id="verseBox">
+        <div class="verse-text" id="verseText">
+          Dieu là il t’a déjà calé hein, faut pas stresser 💛
+        </div>
+        <div class="verse-ref" id="verseRef">
+          Jérémie 29:11 remix
+        </div>
+      </div>
+
+      <div class="buttons">
+        <button class="primary-btn" id="nextVerseBtn">Un autre message</button>
+        <button class="secondary-btn" id="autoPlayBtn">Mode auto</button>
+      </div>
+
+      <div class="footer">
+        Démo visuelle codée en HTML, CSS et JavaScript<br>
+        Parfait pour tester sur GitHub Pages ou enregistrer en vidéo
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const verses = [
+      {
+        text: "Dieu là il t’a déjà calé hein, faut pas stresser 💛",
+        ref: "Jérémie 29:11 remix"
+      },
+      {
+        text: "Même si c’est chaud, Dieu est dans le game 🙏",
+        ref: "Psaume 23 version street"
+      },
+      {
+        text: "Tu es béni, avance seulement, faut pas douter 💫",
+        ref: "Philippiens 4:13 revisité"
+      },
+      {
+        text: "Quand chemin là devient noir, Dieu met lumière dedans ⚡",
+        ref: "Psaume 119:105 remix"
+      },
+      {
+        text: "Ne panique pas, le Vieux Père gère la situation 🔥",
+        ref: "Ésaïe 41:10 street"
+      },
+      {
+        text: "Quand tu tombes, lève-toi encore, Dieu t’a pas laissé hein 🤍",
+        ref: "Proverbes inspiration"
+      },
+      {
+        text: "Ton retard là, c’est pas échec, Dieu prépare ton moment ⏳",
+        ref: "Ecclésiaste vibe"
+      },
+      {
+        text: "Même si on te sous-estime, Dieu connaît ta vraie valeur 👑",
+        ref: "Psaume inspiration"
+      }
+    ];
+
+    const verseText = document.getElementById("verseText");
+    const verseRef = document.getElementById("verseRef");
+    const verseBox = document.getElementById("verseBox");
+    const nextVerseBtn = document.getElementById("nextVerseBtn");
+    const autoPlayBtn = document.getElementById("autoPlayBtn");
+
+    let currentIndex = 0;
+    let autoMode = false;
+    let autoInterval = null;
+
+    function showVerse(index) {
+      verseText.classList.add("fade-out");
+      verseRef.classList.add("fade-out");
+      verseBox.classList.add("flash");
+
+      setTimeout(() => {
+        verseText.textContent = verses[index].text;
+        verseRef.textContent = verses[index].ref;
+        verseText.classList.remove("fade-out");
+        verseRef.classList.remove("fade-out");
+      }, 240);
+
+      setTimeout(() => {
+        verseBox.classList.remove("flash");
+      }, 500);
+
+      createBurst();
+    }
+
+    function nextVerse() {
+      currentIndex = (currentIndex + 1) % verses.length;
+      showVerse(currentIndex);
+    }
+
+    nextVerseBtn.addEventListener("click", nextVerse);
+
+    autoPlayBtn.addEventListener("click", () => {
+      autoMode = !autoMode;
+
+      if (autoMode) {
+        autoPlayBtn.textContent = "Stop auto";
+        autoInterval = setInterval(nextVerse, 3000);
+      } else {
+        autoPlayBtn.textContent = "Mode auto";
+        clearInterval(autoInterval);
+      }
+    });
+
+    // Canvas background
+    const canvas = document.getElementById("bg");
+    const ctx = canvas.getContext("2d");
+
+    let width = 0;
+    let height = 0;
+    let particles = [];
+
+    function resizeCanvas() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+      initParticles();
+    }
+
+    window.addEventListener("resize", resizeCanvas);
+
+    class Particle {
+      constructor(x, y, radius, speedX, speedY, alpha) {
+        this.x = x;
+        this.y = y;
+        this.radius = radius;
+        this.speedX = speedX;
+        this.speedY = speedY;
+        this.alpha = alpha;
+      }
+
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 219, 122, ${this.alpha})`;
+        ctx.shadowBlur = 18;
+        ctx.shadowColor = "rgba(255, 219, 122, 0.45)";
+        ctx.fill();
+      }
+
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+
+        if (this.x < 0 || this.x > width) this.speedX *= -1;
+        if (this.y < 0 || this.y > height) this.speedY *= -1;
+
+        this.draw();
+      }
+    }
+
+    function initParticles() {
+      particles = [];
+      const count = Math.min(85, Math.floor(window.innerWidth / 18));
+
+      for (let i = 0; i < count; i++) {
+        particles.push(
+          new Particle(
+            Math.random() * width,
+            Math.random() * height,
+            Math.random() * 2.4 + 0.6,
+            (Math.random() - 0.5) * 0.35,
+            (Math.random() - 0.5) * 0.35,
+            Math.random() * 0.55 + 0.12
+          )
+        );
+      }
+    }
+
+    function connectParticles() {
+      for (let a = 0; a < particles.length; a++) {
+        for (let b = a + 1; b < particles.length; b++) {
+          const dx = particles[a].x - particles[b].x;
+          const dy = particles[a].y - particles[b].y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (distance < 105) {
+            ctx.beginPath();
+            ctx.moveTo(particles[a].x, particles[a].y);
+            ctx.lineTo(particles[b].x, particles[b].y);
+            ctx.strokeStyle = `rgba(255, 219, 122, ${0.08 - distance / 1500})`;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
+        }
+      }
+    }
+
+    function createBurst() {
+      const centerX = width / 2;
+      const centerY = height / 2;
+
+      for (let i = 0; i < 14; i++) {
+        particles.push(
+          new Particle(
+            centerX + (Math.random() - 0.5) * 80,
+            centerY + (Math.random() - 0.5) * 80,
+            Math.random() * 2.8 + 1,
+            (Math.random() - 0.5) * 2.8,
+            (Math.random() - 0.5) * 2.8,
+            0.7
+          )
+        );
+      }
+
+      if (particles.length > 130) {
+        particles.splice(0, particles.length - 95);
+      }
+    }
+
+    function drawGradientFog() {
+      const gradient = ctx.createRadialGradient(
+        width / 2, height / 2, 40,
+        width / 2, height / 2, Math.max(width, height) / 1.3
+      );
+      gradient.addColorStop(0, "rgba(255, 210, 110, 0.03)");
+      gradient.addColorStop(1, "rgba(0, 0, 0, 0)");
+
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, width, height);
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+
+      drawGradientFog();
+
+      for (const particle of particles) {
+        particle.update();
+      }
+
+      connectParticles();
+
+      requestAnimationFrame(animate);
+    }
+
+    resizeCanvas();
+    animate();
+  </script>
+</body>
+</html>
